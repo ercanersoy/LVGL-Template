@@ -17,6 +17,6 @@ add_subdirectory(lv_drivers)
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-add_executable(main main.c ${SOURCES} ${INCLUDES})
+add_executable(main main.c robotomono_8_latin_extended.c ${SOURCES} ${INCLUDES})
 target_link_libraries(main PRIVATE lvgl lvgl::drivers ${SDL2_LIBRARIES})
 add_custom_target(run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main)

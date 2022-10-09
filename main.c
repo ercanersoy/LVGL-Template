@@ -17,6 +17,9 @@ int main(void)
     static lv_disp_draw_buf_t display_buffer;
     static lv_color_t buffer[SDL_HOR_RES * 100];
     static lv_disp_drv_t display_driver;
+    static lv_style_t style_default;
+
+    extern lv_font_t robotomono_16_latin_extended;
 
     SDL_Event *event;
 
@@ -32,9 +35,13 @@ int main(void)
     display_driver.ver_res = SDL_VER_RES;
     lv_disp_drv_register(&display_driver);
 
+    lv_style_init(&style_default);
+    lv_style_set_text_font(&style_default, &robotomono_16_latin_extended);
+
     lv_obj_t *label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Hello, World!");
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_style(label, &style_default, LV_PART_MAIN);
 
     while(1)
     {
