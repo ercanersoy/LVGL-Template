@@ -14,4 +14,4 @@ MIT License.
 ## Tested Operating Systems
 
 * Pardus 21
-
+* Pardus 23

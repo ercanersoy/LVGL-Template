@@ -1,7 +1,6 @@
 // main.c - Main dource file of LVGL template
 // Written by Ercan Ersoy.
-
-#include <unistd.h>
+// Used ChatGPT for writting some parts.
 
 #include <SDL2/SDL.h>
 
@@ -21,7 +20,7 @@ int main(void)
 
     extern lv_font_t robotomono_16_latin_extended;
 
-    SDL_Event *event;
+    SDL_Event event;
 
     lv_init();
 
@@ -46,13 +45,13 @@ int main(void)
     while(1)
     {
         lv_timer_handler();
-        usleep(5000);
+        SDL_Delay(5);
 
-        if(SDL_PollEvent(event))
+        if(SDL_PollEvent(&event))
         {
-            if(event->type == SDL_WINDOWEVENT)
+            if(event.type == SDL_WINDOWEVENT)
             {
-                if(event->window.event == SDL_WINDOWEVENT_CLOSE)
+                if(event.window.event == SDL_WINDOWEVENT_CLOSE)
                 {
                     break;
                 }
