@@ -12,7 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 
 #if LV_USE_IME_PINYIN != 0
 
@@ -47,12 +48,12 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * kb;
     lv_obj_t * cand_panel;
-    lv_pinyin_dict_t * dict;
+    const lv_pinyin_dict_t * dict;
     lv_ll_t k9_legal_py_ll;
     char * cand_str;            /* Candidate string */
     char   input_char[16];      /* Input box character */
 #if LV_IME_PINYIN_USE_K9_MODE
-    char   k9_input_str[LV_IME_PINYIN_K9_MAX_INPUT]; /* 9-key input(k9) mode input string */
+    char   k9_input_str[LV_IME_PINYIN_K9_MAX_INPUT + 1]; /* 9-key input(k9) mode input string */
     uint16_t k9_py_ll_pos;      /* Current pinyin map pages(k9) */
     uint16_t k9_legal_py_count; /* Count of legal Pinyin numbers(k9) */
     uint16_t k9_input_str_len;  /* 9-key input(k9) mode input string max len */
@@ -83,7 +84,7 @@ lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent);
 /**
  * Set the keyboard of Pinyin input method.
  * @param obj  pointer to a Pinyin input method object
- * @param dict pointer to a Pinyin input method keyboard
+ * @param kb pointer to a Pinyin input method keyboard
  */
 void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb);
 
@@ -101,7 +102,6 @@ void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict);
  */
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode);
 
-
 /*=====================
  * Getter functions
  *====================*/
@@ -113,7 +113,6 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode);
  */
 lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj);
 
-
 /**
  * Set the dictionary of Pinyin input method.
  * @param obj  pointer to a Pinyin input method object
@@ -121,13 +120,12 @@ lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj);
  */
 lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj);
 
-
 /**
  * Set the dictionary of Pinyin input method.
  * @param obj  pointer to a Pinyin input method object
  * @return     pointer to the Pinyin input method dictionary
  */
-lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
+const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
 
 /*=====================
  * Other functions

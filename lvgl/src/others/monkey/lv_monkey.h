@@ -12,7 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../indev/lv_indev.h"
 
 #if LV_USE_MONKEY != 0
 
@@ -32,8 +33,10 @@ typedef struct {
 
     /**< Monkey execution period*/
     struct {
+        //! @cond Doxygen_Suppress
         uint32_t min;
         uint32_t max;
+        //! @endcond
     } period_range;
 
     /**< The range of input value*/
@@ -81,8 +84,6 @@ void lv_monkey_set_enable(lv_monkey_t * monkey, bool en);
  */
 bool lv_monkey_get_enable(lv_monkey_t * monkey);
 
-#if LV_USE_USER_DATA
-
 /**
  * Set the user_data field of the monkey
  * @param monkey   pointer to a monkey
@@ -97,13 +98,11 @@ void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data);
  */
 void * lv_monkey_get_user_data(lv_monkey_t * monkey);
 
-#endif/*LV_USE_USER_DATA*/
-
 /**
  * Delete monkey
  * @param monkey pointer to monkey
  */
-void lv_monkey_del(lv_monkey_t * monkey);
+void lv_monkey_delete(lv_monkey_t * monkey);
 
 /**********************
  *      MACROS

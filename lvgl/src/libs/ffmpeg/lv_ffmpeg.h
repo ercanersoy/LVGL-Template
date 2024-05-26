@@ -12,7 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../widgets/image/lv_image.h"
 #if LV_USE_FFMPEG != 0
 
 /*********************
@@ -24,12 +25,12 @@ extern "C" {
  **********************/
 struct ffmpeg_context_s;
 
-extern const lv_obj_class_t lv_ffmpeg_player_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_ffmpeg_player_class;
 
 typedef struct {
-    lv_img_t img;
+    lv_image_t img;
     lv_timer_t * timer;
-    lv_img_dsc_t imgdsc;
+    lv_image_dsc_t imgdsc;
     bool auto_restart;
     struct ffmpeg_context_s * ffmpeg_ctx;
 } lv_ffmpeg_player_t;
@@ -69,9 +70,9 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);
  * Set the path of the file to be played
  * @param obj pointer to a ffmpeg_player object
  * @param path video file path
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info.
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info.
  */
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path);
+lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path);
 
 /**
  * Set command control video player

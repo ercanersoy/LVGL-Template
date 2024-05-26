@@ -10,6 +10,11 @@
 
 #if LV_USE_MONKEY != 0
 
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_assert.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../display/lv_display.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -19,16 +24,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_monkey {
+struct _lv_monkey {
     lv_monkey_config_t config;
-    lv_indev_drv_t indev_drv;
     lv_indev_data_t indev_data;
     lv_indev_t * indev;
     lv_timer_t * timer;
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
-} lv_monkey_t;
+};
 
 static const lv_key_t lv_key_map[] = {
     LV_KEY_UP,
@@ -49,7 +51,7 @@ static const lv_key_t lv_key_map[] = {
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_monkey_read_cb(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+static void lv_monkey_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig);
 static void lv_monkey_timer_cb(lv_timer_t * timer);
 
@@ -67,24 +69,17 @@ void lv_monkey_config_init(lv_monkey_config_t * config)
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 {
-    lv_monkey_t * monkey = lv_malloc(sizeof(lv_monkey_t));
+    lv_monkey_t * monkey = lv_malloc_zeroed(sizeof(lv_monkey_t));
     LV_ASSERT_MALLOC(monkey);
 
-    lv_memzero(monkey, sizeof(lv_monkey_t));
-
     monkey->config = *config;
-
-    lv_indev_drv_t * drv = &monkey->indev_drv;
-    lv_indev_drv_init(drv);
-    drv->type = config->type;
-    drv->read_cb = lv_monkey_read_cb;
-    drv->user_data = monkey;
-
     monkey->timer = lv_timer_create(lv_monkey_timer_cb, monkey->config.period_range.min, monkey);
     lv_timer_pause(monkey->timer);
 
-    monkey->indev = lv_indev_drv_register(drv);
-
+    monkey->indev = lv_indev_create();
+    lv_indev_set_type(monkey->indev, config->type);
+    lv_indev_set_read_cb(monkey->indev, lv_monkey_read_cb);
+    lv_indev_set_user_data(monkey->indev, monkey);
     return monkey;
 }
 
@@ -106,8 +101,6 @@ bool lv_monkey_get_enable(lv_monkey_t * monkey)
     return !monkey->timer->paused;
 }
 
-#if LV_USE_USER_DATA
-
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
     LV_ASSERT_NULL(monkey);
@@ -120,13 +113,11 @@ void * lv_monkey_get_user_data(lv_monkey_t * monkey)
     return monkey->user_data;
 }
 
-#endif
-
-void lv_monkey_del(lv_monkey_t * monkey)
+void lv_monkey_delete(lv_monkey_t * monkey)
 {
     LV_ASSERT_NULL(monkey);
 
-    lv_timer_del(monkey->timer);
+    lv_timer_delete(monkey->timer);
     lv_indev_delete(monkey->indev);
     lv_free(monkey);
 }
@@ -135,9 +126,9 @@ void lv_monkey_del(lv_monkey_t * monkey)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_monkey_read_cb(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+static void lv_monkey_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_monkey_t * monkey = indev_drv->user_data;
+    lv_monkey_t * monkey = lv_indev_get_user_data(indev);
 
     data->btn_id = monkey->indev_data.btn_id;
     data->point = monkey->indev_data.point;
@@ -159,10 +150,10 @@ static void lv_monkey_timer_cb(lv_timer_t * timer)
     lv_monkey_t * monkey = timer->user_data;
     lv_indev_data_t * data = &monkey->indev_data;
 
-    switch(monkey->indev_drv.type) {
+    switch(lv_indev_get_type(monkey->indev)) {
         case LV_INDEV_TYPE_POINTER:
-            data->point.x = (lv_coord_t)lv_monkey_random(0, LV_HOR_RES - 1);
-            data->point.y = (lv_coord_t)lv_monkey_random(0, LV_VER_RES - 1);
+            data->point.x = (int32_t)lv_monkey_random(0, LV_HOR_RES - 1);
+            data->point.y = (int32_t)lv_monkey_random(0, LV_VER_RES - 1);
             break;
         case LV_INDEV_TYPE_ENCODER:
             data->enc_diff = (int16_t)lv_monkey_random(monkey->config.input_range.min, monkey->config.input_range.max);

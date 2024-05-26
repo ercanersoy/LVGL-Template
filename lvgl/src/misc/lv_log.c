@@ -11,8 +11,11 @@
 
 #include <stdarg.h>
 #include <string.h>
-#include "lv_printf.h"
-#include "../hal/lv_hal_tick.h"
+#include "../stdlib/lv_sprintf.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
+#include "../tick/lv_tick.h"
+#include "../core/lv_global.h"
 
 #if LV_LOG_PRINTF
     #include <stdio.h>
@@ -21,13 +24,25 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_LOG_USE_TIMESTAMP
+    #define last_log_time LV_GLOBAL_DEFAULT()->log_last_log_time
+#endif
+#define custom_print_cb LV_GLOBAL_DEFAULT()->custom_log_print_cb
 
 #if LV_LOG_USE_TIMESTAMP
-    #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRId32 ".%03" LV_PRId32 ", +%" LV_PRId32 ")\t"
+    #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRIu32 ".%03" LV_PRIu32 ", +%" LV_PRIu32 ")\t"
     #define LOG_TIMESTAMP_EXPR t / 1000, t % 1000, t - last_log_time,
 #else
     #define LOG_TIMESTAMP_FMT
     #define LOG_TIMESTAMP_EXPR
+#endif
+
+#if LV_LOG_USE_FILE_LINE
+    #define LOG_FILE_LINE_FMT " %s:%d"
+    #define LOG_FILE_LINE_EXPR , &file[p], line
+#else
+    #define LOG_FILE_LINE_FMT
+    #define LOG_FILE_LINE_EXPR
 #endif
 
 /**********************
@@ -41,7 +56,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_log_print_g_cb_t custom_print_cb;
 
 /**********************
  *      MACROS
@@ -51,46 +65,33 @@ static lv_log_print_g_cb_t custom_print_cb;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Register custom print/write function to call when a log is added.
- * It can format its "File path", "Line number" and "Description" as required
- * and send the formatted log message to a console or serial port.
- * @param print_cb a function pointer to print a log
- */
 void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb)
 {
     custom_print_cb = print_cb;
 }
 
-/**
- * Add a log
- * @param level the level of log. (From `lv_log_level_t` enum)
- * @param file name of the file when the log added
- * @param line line number in the source code where the log added
- * @param func name of the function when the log added
- * @param format printf-like format string
- * @param ... parameters for `format`
- */
 void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...)
 {
     if(level >= _LV_LOG_LEVEL_NUM) return; /*Invalid level*/
-
-#if LV_LOG_USE_TIMESTAMP
-    static uint32_t last_log_time = 0;
-#endif
 
     if(level >= LV_LOG_LEVEL) {
         va_list args;
         va_start(args, format);
 
+#if LV_LOG_USE_FILE_LINE
         /*Use only the file name not the path*/
         size_t p;
-        for(p = strlen(file); p > 0; p--) {
+        for(p = lv_strlen(file); p > 0; p--) {
             if(file[p] == '/' || file[p] == '\\') {
                 p++;    /*Skip the slash*/
                 break;
             }
         }
+#else
+        LV_UNUSED(file);
+        LV_UNUSED(line);
+#endif
+
 #if LV_LOG_USE_TIMESTAMP
         uint32_t t = lv_tick_get();
 #endif
@@ -100,15 +101,15 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         printf("[%s]" LOG_TIMESTAMP_FMT " %s: ",
                lvl_prefix[level], LOG_TIMESTAMP_EXPR func);
         vprintf(format, args);
-        printf(" \t(in %s line #%d)\n", &file[p], line);
+        printf(LOG_FILE_LINE_FMT "\n" LOG_FILE_LINE_EXPR);
 #else
         if(custom_print_cb) {
             char buf[512];
             char msg[256];
             lv_vsnprintf(msg, sizeof(msg), format, args);
-            lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s \t(in %s line #%d)\n",
-                        lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg, &file[p], line);
-            custom_print_cb(buf);
+            lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s" LOG_FILE_LINE_FMT "\n",
+                        lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg LOG_FILE_LINE_EXPR);
+            custom_print_cb(level, buf);
         }
 #endif
 
@@ -132,7 +133,7 @@ void lv_log(const char * format, ...)
     if(custom_print_cb) {
         char buf[512];
         lv_vsnprintf(buf, sizeof(buf), format, args);
-        custom_print_cb(buf);
+        custom_print_cb(LV_LOG_LEVEL_USER, buf);
     }
 #endif
 

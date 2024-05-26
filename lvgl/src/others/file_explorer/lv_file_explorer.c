@@ -9,13 +9,18 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
+#include "../../lvgl.h"
+#include "../../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_file_explorer_class
+#define MY_CLASS (&lv_file_explorer_class)
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
+
+#define quick_access_list_button_style (LV_GLOBAL_DEFAULT()->fe_list_button_style)
 
 /**********************
  *      TYPEDEFS
@@ -43,14 +48,14 @@ static bool is_end_with(const char * str1, const char * str2);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_style_t quick_access_list_btn_style;
 
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
-    .base_class     = &lv_obj_class
+    .base_class     = &lv_obj_class,
+    .name = "file-explorer",
 };
 
 /**********************
@@ -69,7 +74,6 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
     return obj;
 }
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -81,7 +85,7 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     /*If path is unavailable */
-    if((path == NULL) || (strlen(path) <= 0)) return;
+    if((path == NULL) || (lv_strlen(path) <= 0)) return;
 
     char ** dir_str = NULL;
     switch(dir) {
@@ -115,19 +119,11 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
         *dir_str = NULL;
     }
 
-    /*Get the size of the text*/
-    size_t len = strlen(path) + 1;
-
     /*Allocate space for the new text*/
-    *dir_str = lv_malloc(len);
-    LV_ASSERT_MALLOC(*dir_str);
-    if(*dir_str == NULL) return;
-
-    strcpy(*dir_str, path);
+    *dir_str = lv_strdup(path);
 }
 
 #endif
-
 
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 {
@@ -139,7 +135,6 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 
     file_explorer_sort(obj);
 }
-
 
 /*=====================
  * Getter functions
@@ -180,15 +175,6 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
     return explorer->head_area;
 }
 
-lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
-
-    return explorer->quick_access_area;
-}
-
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -199,6 +185,15 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 }
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
+lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
+
+    return explorer->quick_access_area;
+}
+
 lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -289,7 +284,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*The area displayed above the file browse list(head)*/
     explorer->head_area = lv_obj_create(explorer->browser_area);
     lv_obj_set_size(explorer->head_area, LV_PCT(100), LV_PCT(14));
-    lv_obj_clear_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Two lists of quick access bar*/
@@ -299,7 +294,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_size(explorer->list_device, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_device, "DEVICE"), lv_palette_main(LV_PALETTE_ORANGE), 0);
 
-    btn = lv_list_add_btn(explorer->list_device, NULL, LV_SYMBOL_DRIVE " File System");
+    btn = lv_list_add_button(explorer->list_device, NULL, LV_SYMBOL_DRIVE " File System");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 
     /*list 2*/
@@ -307,15 +302,15 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_size(explorer->list_places, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_places, "PLACES"), lv_palette_main(LV_PALETTE_LIME), 0);
 
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_HOME " HOME");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_HOME " HOME");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_VIDEO " Video");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_VIDEO " Video");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_IMAGE " Pictures");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_IMAGE " Pictures");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_AUDIO " Music");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_AUDIO " Music");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_FILE "  Documents");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_FILE "  Documents");
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 #endif
 
@@ -327,8 +322,8 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*Table showing the contents of the table of contents*/
     explorer->file_table = lv_table_create(explorer->browser_area);
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
-    lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
-    lv_table_set_col_cnt(explorer->file_table, 1);
+    lv_table_set_column_width(explorer->file_table, 0, LV_PCT(100));
+    lv_table_set_column_count(explorer->file_table, 1);
     lv_obj_add_event_cb(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
     /*only scroll up and down*/
@@ -339,7 +334,6 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
 
     LV_TRACE_OBJ_CREATE("finished");
 }
-
 
 static void init_style(lv_obj_t * obj)
 {
@@ -403,18 +397,18 @@ static void init_style(lv_obj_t * obj)
     lv_obj_set_style_pad_all(explorer->list_places, 0, 0);
 
     /*Style of the quick access list btn in the quick access bar*/
-    lv_style_init(&quick_access_list_btn_style);
-    lv_style_set_border_width(&quick_access_list_btn_style, 0);
-    lv_style_set_bg_color(&quick_access_list_btn_style, lv_color_hex(0xf2f1f6));
+    lv_style_init(&quick_access_list_button_style);
+    lv_style_set_border_width(&quick_access_list_button_style, 0);
+    lv_style_set_bg_color(&quick_access_list_button_style, lv_color_hex(0xf2f1f6));
 
     uint32_t i, j;
-    for(i = 0; i < lv_obj_get_child_cnt(explorer->quick_access_area); i++) {
+    for(i = 0; i < lv_obj_get_child_count(explorer->quick_access_area); i++) {
         lv_obj_t * child = lv_obj_get_child(explorer->quick_access_area, i);
         if(lv_obj_check_type(child, &lv_list_class)) {
-            for(j = 0; j < lv_obj_get_child_cnt(child); j++) {
+            for(j = 0; j < lv_obj_get_child_count(child); j++) {
                 lv_obj_t * list_child = lv_obj_get_child(child, j);
-                if(lv_obj_check_type(list_child, &lv_list_btn_class)) {
-                    lv_obj_add_style(list_child, &quick_access_list_btn_style, 0);
+                if(lv_obj_check_type(list_child, &lv_list_button_class)) {
+                    lv_obj_add_style(list_child, &quick_access_list_button_style, 0);
                 }
             }
         }
@@ -427,7 +421,7 @@ static void init_style(lv_obj_t * obj)
 static void quick_access_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -437,22 +431,22 @@ static void quick_access_event_handler(lv_event_t * e)
         lv_obj_t * label = lv_obj_get_child(btn, -1);
         char * label_text = lv_label_get_text(label);
 
-        if((strcmp(label_text, LV_SYMBOL_HOME " HOME") == 0)) {
+        if((lv_strcmp(label_text, LV_SYMBOL_HOME " HOME") == 0)) {
             path = &(explorer->home_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_VIDEO " Video") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_VIDEO " Video") == 0)) {
             path = &(explorer->video_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_IMAGE " Pictures") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_IMAGE " Pictures") == 0)) {
             path = &(explorer->pictures_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_AUDIO " Music") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_AUDIO " Music") == 0)) {
             path = &(explorer->music_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_FILE "  Documents") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_FILE "  Documents") == 0)) {
             path = &(explorer->docs_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_DRIVE " File System") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_DRIVE " File System") == 0)) {
             path = &(explorer->fs_dir);
         }
 
@@ -464,7 +458,7 @@ static void quick_access_event_handler(lv_event_t * e)
 static void quick_access_area_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * area = lv_event_get_target(e);
+    lv_obj_t * area = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -488,25 +482,25 @@ static void browser_file_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         char file_name[LV_FILE_EXPLORER_PATH_MAX_LEN];
         const char * str_fn = NULL;
-        uint16_t row;
-        uint16_t col;
+        uint32_t row;
+        uint32_t col;
 
         lv_memzero(file_name, sizeof(file_name));
         lv_table_get_selected_cell(explorer->file_table, &row, &col);
         str_fn = lv_table_get_cell_value(explorer->file_table, row, col);
 
         str_fn = str_fn + 5;
-        if((strcmp(str_fn, ".") == 0))  return;
+        if((lv_strcmp(str_fn, ".") == 0))  return;
 
-        if((strcmp(str_fn, "..") == 0) && (strlen(explorer->current_path) > 3)) {
+        if((lv_strcmp(str_fn, "..") == 0) && (lv_strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
             /*Remove the last '/' character*/
             strip_ext(explorer->current_path);
-            lv_snprintf_builtin((char *)file_name, sizeof(file_name), "%s", explorer->current_path);
+            lv_snprintf((char *)file_name, sizeof(file_name), "%s", explorer->current_path);
         }
         else {
-            if(strcmp(str_fn, "..") != 0) {
-                lv_snprintf_builtin((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
+            if(lv_strcmp(str_fn, "..") != 0) {
+                lv_snprintf((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
             }
         }
 
@@ -516,20 +510,19 @@ static void browser_file_event_handler(lv_event_t * e)
             show_dir(obj, (char *)file_name);
         }
         else {
-            if(strcmp(str_fn, "..") != 0) {
+            if(lv_strcmp(str_fn, "..") != 0) {
                 explorer->sel_fn = str_fn;
-                lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             }
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_table_set_col_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
+        lv_table_set_column_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
     else if((code == LV_EVENT_CLICKED) || (code == LV_EVENT_RELEASED)) {
-        lv_event_send(obj, LV_EVENT_CLICKED, NULL);
+        lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);
     }
 }
-
 
 static void show_dir(lv_obj_t * obj, const char * path)
 {
@@ -552,14 +545,14 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
     while(1) {
-        res = lv_fs_dir_read(&dir, fn);
+        res = lv_fs_dir_read(&dir, fn, sizeof(fn));
         if(res != LV_FS_RES_OK) {
             LV_LOG_USER("Driver, file or directory is not exists %d!", res);
             break;
         }
 
         /*fn is empty, if not more files to read*/
-        if(strlen(fn) == 0) {
+        if(lv_strlen(fn) == 0) {
             LV_LOG_USER("Not more files to read!");
             break;
         }
@@ -571,7 +564,8 @@ static void show_dir(lv_obj_t * obj, const char * path)
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "1");
         }
-        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true)) {
+        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true) || \
+                (is_end_with(fn, ".wav") == true) || (is_end_with(fn, ".WAV") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "2");
         }
@@ -597,28 +591,27 @@ static void show_dir(lv_obj_t * obj, const char * path)
 
     lv_fs_dir_close(&dir);
 
-    lv_table_set_row_cnt(explorer->file_table, index);
+    lv_table_set_row_count(explorer->file_table, index);
     file_explorer_sort(obj);
-    lv_event_send(obj, LV_EVENT_READY, NULL);
+    lv_obj_send_event(obj, LV_EVENT_READY, NULL);
 
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
     lv_memzero(explorer->current_path, sizeof(explorer->current_path));
-    strcpy(explorer->current_path, path);
+    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path) - 1);
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
-    size_t current_path_len = strlen(explorer->current_path);
+    size_t current_path_len = lv_strlen(explorer->current_path);
     if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
         *((explorer->current_path) + current_path_len) = '/';
     }
 }
 
-
 /*Remove the specified suffix*/
 static void strip_ext(char * dir)
 {
-    char * end = dir + strlen(dir);
+    char * end = dir + lv_strlen(dir);
 
     while(end >= dir && *end != '/') {
         --end;
@@ -631,8 +624,6 @@ static void strip_ext(char * dir)
         *(end + 1) = '\0';
     }
 }
-
-
 
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
@@ -648,14 +639,13 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
     lv_table_set_cell_value(tb, j, 1, lv_table_get_cell_value(tb, 0, 2));
 }
 
-
 static void file_explorer_sort(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    uint16_t sum = lv_table_get_row_cnt(explorer->file_table);
+    uint16_t sum = lv_table_get_row_count(explorer->file_table);
 
     if(sum > 1) {
         switch(explorer->sort) {
@@ -680,9 +670,9 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     int16_t gt = hi;
     const char * v = lv_table_get_cell_value(tb, lo, 1);
     while(i <= gt) {
-        if(strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
+        if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
             exch_table_item(tb, lt++, i++);
-        else if(strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
+        else if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
             exch_table_item(tb, i, gt--);
         else
             i++;
@@ -692,14 +682,13 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     sort_by_file_kind(tb, gt + 1, hi);
 }
 
-
 static bool is_end_with(const char * str1, const char * str2)
 {
     if(str1 == NULL || str2 == NULL)
         return false;
 
-    uint16_t len1 = strlen(str1);
-    uint16_t len2 = strlen(str2);
+    uint16_t len1 = lv_strlen(str1);
+    uint16_t len2 = lv_strlen(str2);
     if((len1 < len2) || (len1 == 0 || len2 == 0))
         return false;
 

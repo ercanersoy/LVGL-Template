@@ -7,29 +7,28 @@
 #include "lv_test_indev.h"
 #include "lv_test_init.h"
 
-static lv_coord_t x_act;
-static lv_coord_t y_act;
+static int32_t x_act;
+static int32_t y_act;
 static uint32_t key_act;
 static int32_t diff_act;
 static bool mouse_pressed;
 static bool key_pressed;
 static bool enc_pressed;
 
-void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_UNUSED(drv);
-    data->point.x = x_act;
-    data->point.y = y_act;
+    LV_UNUSED(indev);
+    lv_point_set(&data->point, x_act, y_act);
     data->state = mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
-void lv_test_mouse_move_to(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_move_to(int32_t x, int32_t y)
 {
     x_act = x;
     y_act = y;
 }
 
-void lv_test_mouse_move_by(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_move_by(int32_t x, int32_t y)
 {
     x_act += x;
     y_act += y;
@@ -45,7 +44,7 @@ void lv_test_mouse_release(void)
     mouse_pressed = false;
 }
 
-void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_click_at(int32_t x, int32_t y)
 {
     lv_test_mouse_release();
     lv_test_indev_wait(50);
@@ -56,10 +55,9 @@ void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
     lv_test_indev_wait(50);
 }
 
-
-void lv_test_keypad_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void lv_test_keypad_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(indev);
     data->key = key_act;
     data->state = key_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
@@ -86,9 +84,9 @@ void lv_test_key_hit(uint32_t k)
     lv_test_indev_wait(50);
 }
 
-void lv_test_encoder_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
+void lv_test_encoder_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(indev);
     data->enc_diff = diff_act;
     data->state = enc_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
     diff_act = 0;
@@ -104,7 +102,6 @@ void lv_test_encoder_turn(int32_t d)
     diff_act += d;
     lv_test_indev_wait(50);
 }
-
 
 void lv_test_encoder_press(void)
 {
@@ -126,7 +123,6 @@ void lv_test_encoder_click(void)
     lv_test_indev_wait(50);
 }
 
-
 void lv_test_indev_wait(uint32_t ms)
 {
     uint32_t t = lv_tick_get();
@@ -135,6 +131,5 @@ void lv_test_indev_wait(uint32_t ms)
         lv_tick_inc(1);
     }
 }
-
 
 #endif

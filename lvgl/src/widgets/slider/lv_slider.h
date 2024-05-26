@@ -22,7 +22,6 @@ extern "C" {
 #error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR 1)"
 #endif
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -30,33 +29,29 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_slider_mode_t {
     LV_SLIDER_MODE_NORMAL = LV_BAR_MODE_NORMAL,
     LV_SLIDER_MODE_SYMMETRICAL = LV_BAR_MODE_SYMMETRICAL,
     LV_SLIDER_MODE_RANGE = LV_BAR_MODE_RANGE
 };
+
+#ifdef DOXYGEN
+typedef _lv_slider_mode_t lv_slider_mode_t;
+#else
 typedef uint8_t lv_slider_mode_t;
+#endif /*DOXYGEN*/
 
 typedef struct {
     lv_bar_t bar;       /*Add the ancestor's type first*/
     lv_area_t left_knob_area;
     lv_area_t right_knob_area;
+    lv_point_t pressed_point;
     int32_t * value_to_set; /*Which bar value to set*/
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
     uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
 } lv_slider_t;
 
-extern const lv_obj_class_t lv_slider_class;
-
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_slider_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_SLIDER_DRAW_PART_KNOB,           /**< The main (right) knob's rectangle*/
-    LV_SLIDER_DRAW_PART_KNOB_LEFT,      /**< The left knob's rectangle*/
-} lv_slider_draw_part_type_t;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_slider_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -169,7 +164,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj);
 
 /**
  * Get the mode of the slider.
- * @param obj       pointer to a bar object
+ * @param slider       pointer to a slider object
  * @return          see ::lv_slider_mode_t
  */
 static inline lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
@@ -178,6 +173,16 @@ static inline lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
     if(mode == LV_BAR_MODE_SYMMETRICAL) return LV_SLIDER_MODE_SYMMETRICAL;
     else if(mode == LV_BAR_MODE_RANGE) return LV_SLIDER_MODE_RANGE;
     else return LV_SLIDER_MODE_NORMAL;
+}
+
+/**
+ * Give the slider is in symmetrical mode or not
+ * @param obj       pointer to slider object
+ * @return          true: in symmetrical mode false : not in
+*/
+static inline bool lv_slider_is_symmetrical(lv_obj_t * obj)
+{
+    return lv_bar_is_symmetrical(obj);
 }
 
 /**********************

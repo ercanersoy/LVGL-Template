@@ -13,9 +13,6 @@
 
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS        0
-#if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW  0
-#endif
 
 /*Demonstrate the usage of encoder and keyboard*/
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
@@ -35,6 +32,18 @@
 # define LV_DEMO_MUSIC_LARGE        0
 # define LV_DEMO_MUSIC_AUTO_PLAY    0
 #endif
+
+/*Flex layout demo*/
+#define LV_USE_DEMO_FLEX_LAYOUT     0
+
+/*Smart-phone like multi-language demo*/
+#define LV_USE_DEMO_MULTILANG       0
+
+/*Widget transformation demo*/
+#define LV_USE_DEMO_TRANSFORM       0
+
+/*Demonstrate scroll settings*/
+#define LV_USE_DEMO_SCROLL          0
 ...
 ```
 
@@ -48,7 +57,58 @@
 ...
 ```
 
+## Configure Demos Entry
 
+"demos/lv_demos.c" provides `lv_demos_create` and `lv_demos_usage` to simplify the creation of demos.
+
+If you build your main program named `lv_demos`, then you can run the widgets demo by running `lv_demos widgets` and the benchmark demo by running `lv_demos benchmark 1`.
+
+For example:
+
+```c
+//! main.c
+#include "lvgl.h"
+#include "demos/lv_demos.h"
+
+...
+static lv_disp_t* hal_init(void)
+{
+  lv_disp_t* disp = NULL;
+
+  ...
+  /* TODO: init display and indev */
+  ...
+
+  return disp;
+}
+
+int main(int argc, char ** argv)
+{
+  lv_init();
+
+  lv_disp_t* disp = hal_init();
+  if (disp == NULL) {
+    LV_LOG_ERROR("lv_demos initialization failure!");
+    return 1;
+  }
+
+  if (!lv_demos_create(&argv[1], argc - 1)) {
+    lv_demos_usage();
+    goto demo_end;
+  }
+
+  while (1) {
+    uint32_t delay = lv_timer_handler();
+    if (delay < 1) delay = 1;
+    usleep(delay * 1000);
+  }
+
+demo_end:
+  lv_deinit();
+  return 0;
+}
+
+```
 
 ## Demos
 

@@ -17,7 +17,6 @@ extern "C" {
 
 #if LV_USE_FRAGMENT
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -128,7 +127,7 @@ struct _lv_fragment_class_t {
 /**
  * Fragment states
  */
-typedef struct _lv_fragment_managed_states_t  {
+struct _lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */
@@ -150,14 +149,14 @@ typedef struct _lv_fragment_managed_states_t  {
      */
     bool obj_created;
     /**
-     * true before `lv_fragment_del_obj` is called. Don't touch any object if this is true
+     * true before `lv_fragment_delete_obj` is called. Don't touch any object if this is true
      */
     bool destroying_obj;
     /**
      * true if this fragment is in navigation stack that can be popped
      */
     bool in_stack;
-} lv_fragment_managed_states_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -174,7 +173,7 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent);
  * Destroy fragment manager instance
  * @param manager Fragment manager instance
  */
-void lv_fragment_manager_del(lv_fragment_manager_t * manager);
+void lv_fragment_manager_delete(lv_fragment_manager_t * manager);
 
 /**
  * Create object of all fragments managed by this manager.
@@ -186,7 +185,7 @@ void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager);
  * Delete object created by all fragments managed by this manager. Instance of fragments will not be deleted.
  * @param manager Fragment manager instance
  */
-void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager);
+void lv_fragment_manager_delete_obj(lv_fragment_manager_t * manager);
 
 /**
  * Attach fragment to manager, and add to container.
@@ -265,7 +264,6 @@ lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * ma
  */
 lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * manager);
 
-
 /**
  * Create a fragment instance.
  *
@@ -279,7 +277,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
  * Destroy a fragment.
  * @param fragment Fragment instance.
  */
-void lv_fragment_del(lv_fragment_t * fragment);
+void lv_fragment_delete(lv_fragment_t * fragment);
 
 /**
  * Get associated manager of this fragment
@@ -316,14 +314,13 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
  *
  * @param fragment Fragment instance.
  */
-void lv_fragment_del_obj(lv_fragment_t * fragment);
+void lv_fragment_delete_obj(lv_fragment_t * fragment);
 
 /**
  * Destroy obj in fragment, and recreate them.
  * @param fragment Fragment instance
  */
 void lv_fragment_recreate_obj(lv_fragment_t * fragment);
-
 
 /**********************
  *      MACROS

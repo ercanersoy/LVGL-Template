@@ -18,6 +18,12 @@ scripts/install-prerequisites.sh
 3. Clean prior test build, build all build-only tests,
    run executable tests, and generate code coverage
    report `./tests/main.py --clean --report build test`.
+4. You can re-generate the test images by adding option `--update-image`.
+   It relies on scripts/LVGLImage.py, which requires pngquant and pypng.
+   You can run below command firstly and follow instructions in logs to install them.
+   `./tests/main.py --update-image test`
+   Note that different version of pngquant may generate different images.
+   As of now the generated image on CI uses pngquant 2.13.1-1.
 
 For full information on running tests run: `./tests/main.py --help`.
 
@@ -45,6 +51,6 @@ See the list of asserts [here](https://github.com/ThrowTheSwitch/Unity/blob/mast
 There are some custom, LVGL specific asserts:
 - `TEST_ASSERT_EQUAL_SCREENSHOT("image1.png")` Render the active screen and compare its content with an image in the `ref_imgs` folder.
    - If the reference image is not found it will be created automatically from the rendered screen.
-   - If the compare fails `lvgl/test_screenshot_error.h` is created with the content of the frame buffer as an image. To see the that image `#include "test_screenshot_error.h"` and call `test_screenshot_error_show();`.
+   - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
 - `TEST_ASSERT_EQUAL_COLOR(color1, color2)` Compare two colors.
 

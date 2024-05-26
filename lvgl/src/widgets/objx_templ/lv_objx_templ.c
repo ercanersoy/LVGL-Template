@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_templ_class
+#define MY_CLASS (&lv_templ_class)
 
 /**********************
  *      TYPEDEFS
@@ -47,7 +47,8 @@ const lv_obj_class_t lv_templ_class = {
     .instance_size = sizeof(lv_templ_t),
     .group_def = LV_OBJ_CLASS_GROUP_DEF_INHERIT,
     .editable = LV_OBJ_CLASS_EDITABLE_INHERIT,
-    .base_class = &lv_templ_class
+    .base_class = &lv_templ_class,
+    .name = "templ",
 };
 
 /**********************
@@ -124,11 +125,11 @@ static void lv_templ_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    res = LV_EVENT_base(MY_CLASS, e);
+    if(res != LV_RESULT_OK) return;
 
     /*Add the widget specific event handling here*/
 }

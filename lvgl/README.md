@@ -1,12 +1,8 @@
-**IMPORTANT NOTE** The next major version (v9.0.0) is developed in the master branch.
-The last stable version is available in the [release/v8.3](https://github.com/lvgl/lvgl/tree/release/v8.3) branch.
 
----
-
-<a href="https://opencollective.com/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+<a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 
 <p align="right">
-  <b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
+  <b>English</b> | <a href="./docs/README_zh.rst">中文</a> | <a href="./docs/README_pt_BR.rst">Português do Brasil</a> | <a href="./docs/README_jp.rst">日本語</a>
 </p>
 
 <br>
@@ -28,8 +24,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
 <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
 <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
-<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
-<a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> 
 </p>
 <br>
 
@@ -41,12 +36,8 @@ LVGL is the most popular free and open source embedded graphics library to creat
 **Feature Rich**<br>
 It has all the features to create modern and beautiful GUIs: 30+ built-in widgets, a powerful style system, web inspired layout managers, and a typography system supporting many languages. To integrate LVGL into your platform, all you need is at least 32kB RAM and 128 kB Flash, a C compiler, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
 
-**UI Editor**<br>
-SquareLine Studio is a professional yet affordable drag and drop UI editor for LVGL. It runs on Windows, Linux and MacOS too and you can try it out even without registering to the website.
-
 **Services**<br>
 Our team is ready to help you with graphics design, UI implementation and consulting services. Contact us if you need some support during the development of your next GUI project.
-
 
 ## :rocket: Features
 
@@ -54,7 +45,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled to any MCU or MPU, with any (RT)OS.
   - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Porting Guide](https://docs.lvgl.io/master/porting/project.html)
-  - Distributed under the MIT licence, so you can easily use it in commercial projects too.
+  - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
   - OS, External memory and GPU are supported but not required.
 
@@ -66,7 +57,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
   - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/overview/display.html) support.
+  - [Multiple display](https://docs.lvgl.io/master/overview/disp.html#multiple-display-support) support.
 
 **Binding and Build Support**
   - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
@@ -78,21 +69,20 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Docs, Tools, and Services**
   - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
-  - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
 ## :heart: Sponsor
 
-If LVGL saved you a lot of time and money or you just had fun using it, consider [Supporting its Development](https://opencollective.com/lvgl).
+If LVGL saved you a lot of time and money or you just had fun using it, consider [Supporting its Development](https://github.com/sponsors/lvgl).
 
 **How do we spend the donations?**<br>
 Our goal is to provide financial compensation for people who do the most for LVGL. It means not only the maintainers but anyone who implements a great feature should get a payment from the accumulated money. We use the donations to cover our operational costs like servers and related services.
 
 **How to donate?**<br>
-We use [Open Collective](https://opencollective.com/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way. 
+We use [GitHub Sponsors](https://github.com/sponsors/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way.
 
 **How to get paid for your contribution?**<br>
-If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying "Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you will receive teh payment in a few days.
+If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying "Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you will receive the payment in a few days.
 
 **Organizations supporting LVGL**<br>
 [![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
@@ -102,15 +92,16 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 
 ## :package: Packages
 LVGL is available as:
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/reference/kconfig/CONFIG_LVGL.html)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
+- [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+- [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
-- NXP MCUXpresso library
+- [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
 - CMSIS-Pack
+- [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
+
 
 ## :robot: Examples
 
@@ -118,25 +109,62 @@ See some examples of creating widgets, using layouts and applying styles. You wi
 
 For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
-### Button with Click Event
 
-![LVGL button with label example](https://github.com/kisvegabor/test/raw/master/readme_example_1.gif)
+### Hello world label
+
+![Simple Hello world label example in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_1.png)
 
 <details>
   <summary>C code</summary>
 
 ```c
-lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /*Add a button to the current screen*/
-lv_obj_center(btn);                                             /*Set its position*/
-lv_obj_set_size(btn, 100, 50);                                  /*Set its size*/
-lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+/*Change the active screen's background color*/
+lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
 
-lv_obj_t * label = lv_label_create(btn);                        /*Add a label to the button*/
+/*Create a white label, set its text and align it to the center*/
+lv_obj_t * label = lv_label_create(lv_screen_active());
+lv_label_set_text(label, "Hello world");
+lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
+lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+```
+</details>
+
+<details>
+  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_direct=4ab7c40c35b0dc349aa2f0c3b00938d7d8e8ac9f" target="_blank">Online Simulator</a></summary>
+
+```python
+# Change the active screen's background color
+scr = lv.screen_active()
+scr.set_style_bg_color(lv.color_hex(0x003a57), lv.PART.MAIN)
+
+# Create a white label, set its text and align it to the center
+label = lv.label(lv.screen_active())
+label.set_text("Hello world")
+label.set_style_text_color(lv.color_hex(0xffffff), lv.PART.MAIN)
+label.align(lv.ALIGN.CENTER, 0, 0)
+```
+</details>
+<br>
+
+### Button with Click Event
+
+![LVGL button with label example](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
+
+<details>
+  <summary>C code</summary>
+
+```c
+lv_obj_t * button = lv_button_create(lv_screen_active());                   /*Add a button to the current screen*/
+lv_obj_center(button);                                             /*Set its position*/
+lv_obj_set_size(button, 100, 50);                                  /*Set its size*/
+lv_obj_add_event_cb(button, button_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+
+lv_obj_t * label = lv_label_create(button);                        /*Add a label to the button*/
 lv_label_set_text(label, "Button");                             /*Set the labels text*/
 lv_obj_center(label);                                           /*Align the label to the center*/
 ...
 
-void btn_event_cb(lv_event_t * e)
+void button_event_cb(lv_event_t * e)
 {
   printf("Clicked\n");
 }
@@ -147,16 +175,16 @@ void btn_event_cb(lv_event_t * e)
   <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">Online Simulator</a></summary>
 
 ```python
-def btn_event_cb(e):
+def button_event_cb(e):
   print("Clicked")
 
 # Create a Button and a Label
-btn = lv.btn(lv.scr_act())
-btn.center()
-btn.set_size(100, 50)
-btn.add_event_cb(btn_event_cb, lv.EVENT.CLICKED, None)
+button = lv.button(lv.screen_active())
+button.center()
+button.set_size(100, 50)
+button.add_event_cb(button_event_cb, lv.EVENT.CLICKED, None)
 
-label = lv.label(btn)
+label = lv.label(button)
 label.set_text("Button")
 label.center()
 ```
@@ -164,32 +192,32 @@ label.center()
 <br>
 
 ### Checkboxes with Layout
-![Checkboxes with layout in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
+![Checkboxes with layout in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
 
 <details>
   <summary>C code</summary>
 
 ```c
 
-lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
 
 lv_obj_t * cb;
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Apple");
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Banana");
 lv_obj_add_state(cb, LV_STATE_CHECKED);
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Lemon");
 lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
@@ -203,7 +231,7 @@ lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 ```python
 def event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED:
         txt = obj.get_text()
         if obj.get_state() & lv.STATE.CHECKED:
@@ -213,24 +241,24 @@ def event_handler(e):
         print(txt + ":" + state)
 
 
-lv.scr_act().set_flex_flow(lv.FLEX_FLOW.COLUMN)
-lv.scr_act().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
+lv.screen_active().set_flex_flow(lv.FLEX_FLOW.COLUMN)
+lv.screen_active().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Apple")
 cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Banana")
 cb.add_state(lv.STATE.CHECKED)
 cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Lemon")
 cb.add_state(lv.STATE.DISABLED)
 cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
 cb.set_text("Melon")
 cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
@@ -240,14 +268,14 @@ cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 <br>
 
 ### Styling a Slider
-![Styling a slider with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
+![Styling a slider with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.gif)
 
 
 <details>
   <summary>C code</summary>
 
 ```c
-lv_obj_t * slider = lv_slider_create(lv_scr_act());
+lv_obj_t * slider = lv_slider_create(lv_screen_active());
 lv_slider_set_value(slider, 70, LV_ANIM_OFF);
 lv_obj_set_size(slider, 300, 20);
 lv_obj_center(slider);
@@ -268,7 +296,7 @@ lv_style_set_bg_grad_dir(&style_indicator, LV_GRAD_DIR_HOR);
 lv_style_set_shadow_color(&style_indicator, lv_color_hex(0x37B9F5));
 lv_style_set_shadow_width(&style_indicator, 15);
 lv_style_set_shadow_spread(&style_indicator, 5);
-
+4
 /*Add the style sheet to the slider's INDICATOR part*/
 lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
 
@@ -291,7 +319,7 @@ lv_obj_set_style_shadow_spread(slider, 2, LV_PART_KNOB);
 
 ```python
 # Create a slider and add the style
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.set_value(70, lv.ANIM.OFF)
 slider.set_size(300, 20)
 slider.center()
@@ -328,26 +356,26 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 
 ### English, Hebrew (mixed LTR-RTL) and Chinese texts
 
-![English, Hebrew and Chinese texts with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.png)
+![English, Hebrew and Chinese texts with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_5.png)
 
 <details>
   <summary>C code</summary>
 
 ```c
-lv_obj_t * ltr_label = lv_label_create(lv_scr_act());
+lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
 lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
 lv_obj_set_style_text_font(ltr_label, &lv_font_montserrat_16, 0);
 lv_obj_set_width(ltr_label, 310);
 lv_obj_align(ltr_label, LV_ALIGN_TOP_LEFT, 5, 5);
 
-lv_obj_t * rtl_label = lv_label_create(lv_scr_act());
+lv_obj_t * rtl_label = lv_label_create(lv_screen_active());
 lv_label_set_text(rtl_label,"מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).");
 lv_obj_set_style_base_dir(rtl_label, LV_BASE_DIR_RTL, 0);
 lv_obj_set_style_text_font(rtl_label, &lv_font_dejavu_16_persian_hebrew, 0);
 lv_obj_set_width(rtl_label, 310);
 lv_obj_align(rtl_label, LV_ALIGN_LEFT_MID, 5, 0);
 
-lv_obj_t * cz_label = lv_label_create(lv_scr_act());
+lv_obj_t * cz_label = lv_label_create(lv_screen_active());
 lv_label_set_text(cz_label,
                   "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
 lv_obj_set_style_text_font(cz_label, &lv_font_simsun_16_cjk, 0);
@@ -361,14 +389,14 @@ lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
   <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">Online Simulator</a></summary>
 
 ```python
-ltr_label = lv.label(lv.scr_act())
+ltr_label = lv.label(lv.screen_active())
 ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
 ltr_label.set_style_text_font(lv.font_montserrat_16, 0);
 
 ltr_label.set_width(310)
 ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)
 
-rtl_label = lv.label(lv.scr_act())
+rtl_label = lv.label(lv.screen_active())
 rtl_label.set_text("מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).")
 rtl_label.set_style_base_dir(lv.BASE_DIR.RTL, 0)
 rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
@@ -377,7 +405,7 @@ rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
 
 font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 
-cz_label = lv.label(lv.scr_act())
+cz_label = lv.label(lv.screen_active())
 cz_label.set_style_text_font(font_simsun_16_cjk, 0)
 cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")
 cz_label.set_width(310)
@@ -397,7 +425,7 @@ This list will guide you to get started with LVGL step-by-step.
 
 **Start to Use LVGL**
 
-  4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (10 minutes)
+  4. Set up a [Simulator](https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator) (10 minutes)
   5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
   6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
 
@@ -410,11 +438,6 @@ This list will guide you to get started with LVGL step-by-step.
 
   9. If you have questions go to the [Forum](http://forum.lvgl.io/)
   10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
-
-**Go for More**
-
-  11. Download and try out [SquareLine Studio](https://squareline.io/).
-  12. Contact us for [Services](https://lvgl.io/services).
 
 
 ## :handshake: Services
@@ -436,7 +459,7 @@ LVGL is an open project and contribution is very welcome. There are many ways to
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
 
-More than 300 people already left their fingerprint in LVGL. Be one them! See your here! :slightly_smiling_face:
+More than 300 people already left their fingerprint in LVGL. Be one them! See you here! :slightly_smiling_face:
 
 <a href="https://github.com/lvgl/lvgl/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" />

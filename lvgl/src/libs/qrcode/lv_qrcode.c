@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_qrcode.h"
+#include "../../lvgl.h"
+
 #if LV_USE_QRCODE
 
 #include "qrcodegen.h"
@@ -14,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_qrcode_class
+#define MY_CLASS (&lv_qrcode_class)
 
 /**********************
  *      TYPEDEFS
@@ -33,12 +34,10 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 const lv_obj_class_t lv_qrcode_class = {
     .constructor_cb = lv_qrcode_constructor,
     .destructor_cb = lv_qrcode_destructor,
-    .base_class = &lv_canvas_class
+    .instance_size = sizeof(lv_qrcode_t),
+    .base_class = &lv_canvas_class,
+    .name = "qrcode",
 };
-
-static lv_coord_t size_param;
-static lv_color_t dark_color_param;
-static lv_color_t light_color_param;
 
 /**********************
  *      MACROS
@@ -48,58 +47,81 @@ static lv_color_t light_color_param;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create an empty QR code (an `lv_canvas`) object.
- * @param parent point to an object where to create the QR code
- * @param size width and height of the QR code
- * @param dark_color dark color of the QR code
- * @param light_color light color of the QR code
- * @return pointer to the created QR code object
- */
-lv_obj_t * lv_qrcode_create(lv_obj_t * parent, lv_coord_t size, lv_color_t dark_color, lv_color_t light_color)
+lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
-    size_param = size;
-    light_color_param = light_color;
-    dark_color_param = dark_color;
-
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
-
 }
 
-/**
- * Set the data of a QR code object
- * @param qrcode pointer to aQ code object
- * @param data data to display
- * @param data_len length of data in bytes
- * @return LV_RES_OK: if no error; LV_RES_INV: on error
- */
-lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_len)
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
-    lv_color_t c;
-    c.full = 1;
-    lv_canvas_fill_bg(qrcode, c, LV_OPA_COVER);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
+    lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create(size, size, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
+    if(new_buf == NULL) {
+        LV_LOG_ERROR("malloc failed for canvas buffer");
+        return;
+    }
 
-    lv_img_dsc_t * imgdsc = lv_canvas_get_img(qrcode);
+    lv_canvas_set_draw_buf(obj, new_buf);
+    LV_LOG_INFO("set canvas buffer: %p, size = %d", (void *)new_buf, (int)size);
+
+    /*Clear canvas buffer*/
+    lv_canvas_fill_bg(obj, lv_color_white(), LV_OPA_COVER);
+
+    if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
+}
+
+void lv_qrcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+    qrcode->dark_color = color;
+}
+
+void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+    qrcode->light_color = color;
+}
+
+lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    if(draw_buf == NULL) {
+        LV_LOG_ERROR("canvas draw buffer is NULL");
+        return LV_RESULT_INVALID;
+    }
+
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->light_color, 0xff));
+    lv_color_t c = lv_color_hex(1);
+    lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
+
+    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
-    if(qr_version <= 0) return LV_RES_INV;
+    if(qr_version <= 0) return LV_RESULT_INVALID;
     int32_t qr_size = qrcodegen_version2size(qr_version);
-    if(qr_size <= 0) return LV_RES_INV;
-    int32_t scale = imgdsc->header.w / qr_size;
-    if(scale <= 0) return LV_RES_INV;
-    int32_t remain = imgdsc->header.w % qr_size;
+    if(qr_size <= 0) return LV_RESULT_INVALID;
+    int32_t scale = draw_buf->header.w / qr_size;
+    if(scale <= 0) return LV_RESULT_INVALID;
 
-    /* The qr version is incremented by four point */
-    uint32_t version_extend = remain / (scale << 2);
-    if(version_extend && qr_version < qrcodegen_VERSION_MAX) {
-        qr_version = qr_version + version_extend > qrcodegen_VERSION_MAX ?
-                     qrcodegen_VERSION_MAX : qr_version + version_extend;
+    /* Pick the largest QR code that still maintains scale. */
+    for(int32_t i = qr_version + 1; i < qrcodegen_VERSION_MAX; i++) {
+        if(qrcodegen_version2size(i) * scale > draw_buf->header.w)
+            break;
+
+        qr_version = i;
     }
+    qr_size = qrcodegen_version2size(qr_version);
 
     uint8_t * qr0 = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(qr0);
@@ -115,20 +137,20 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
     if(!ok) {
         lv_free(qr0);
         lv_free(data_tmp);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
-    lv_coord_t obj_w = imgdsc->header.w;
+    int32_t obj_w = draw_buf->header.w;
     qr_size = qrcodegen_getSize(qr0);
     scale = obj_w / qr_size;
     int scaled = qr_size * scale;
     int margin = (obj_w - scaled) / 2;
-    uint8_t * buf_u8 = (uint8_t *)imgdsc->data + 8;    /*+8 skip the palette*/
+    uint8_t * buf_u8 = (uint8_t *)draw_buf->data + 8;    /*+8 skip the palette*/
 
     /* Copy the qr code canvas:
      * A simple `lv_canvas_set_px` would work but it's slow for so many pixels.
      * So buffer 1 byte (8 px) from the qr code and set it in the canvas image */
-    uint32_t row_byte_cnt = (imgdsc->header.w + 7) >> 3;
+    uint32_t row_byte_cnt = draw_buf->header.stride;
     int y;
     for(y = margin; y < scaled + margin; y += scale) {
         uint8_t b = 0;
@@ -141,8 +163,8 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c.full = a ? 0 : 1;
-                lv_canvas_set_px_color(qrcode, x, y, c);
+                c = lv_color_hex(a ? 0 : 1);
+                lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
             }
             else {
                 if(!a) b |= (1 << (7 - p));
@@ -175,13 +197,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
 
     lv_free(qr0);
     lv_free(data_tmp);
-    return LV_RES_OK;
-}
-
-
-void lv_qrcode_delete(lv_obj_t * qrcode)
-{
-    lv_obj_del(qrcode);
+    return LV_RESULT_OK;
 }
 
 /**********************
@@ -192,24 +208,24 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 {
     LV_UNUSED(class_p);
 
-    uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(size_param, size_param);
-    uint8_t * buf = lv_malloc(buf_size);
-    LV_ASSERT_MALLOC(buf);
-    if(buf == NULL) return;
+    /*Set default size*/
+    lv_qrcode_set_size(obj, LV_DPI_DEF);
 
-    lv_canvas_set_buffer(obj, buf, size_param, size_param, LV_IMG_CF_INDEXED_1BIT);
-    lv_canvas_set_palette(obj, 0, dark_color_param);
-    lv_canvas_set_palette(obj, 1, light_color_param);
+    /*Set default color*/
+    lv_qrcode_set_dark_color(obj, lv_color_black());
+    lv_qrcode_set_light_color(obj, lv_color_white());
 }
 
 static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img);
-    lv_free((void *)img->data);
-    img->data = NULL;
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    if(draw_buf == NULL) return;
+    lv_image_cache_drop(draw_buf);
+
+    /*@fixme destroy buffer in cache free_cb.*/
+    lv_draw_buf_destroy(draw_buf);
 }
 
 #endif /*LV_USE_QRCODE*/

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj.h"
-#if LV_USE_CALENDAR_HEADER_ARROW
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 
 /*********************
  *      DEFINES
@@ -23,7 +23,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-extern const lv_obj_class_t lv_calendar_header_arrow_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_header_arrow_class;
 
 /**********************
  * GLOBAL PROTOTYPES

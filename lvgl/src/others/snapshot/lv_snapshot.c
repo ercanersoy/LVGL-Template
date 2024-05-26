@@ -10,8 +10,11 @@
 #if LV_USE_SNAPSHOT
 
 #include <stdbool.h>
-#include "../../core/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../core/lv_refr.h"
+#include "../../display/lv_display_private.h"
+#include "../../stdlib/lv_string.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -36,178 +39,108 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/** Get the buffer needed for object snapshot image.
- *
- * @param obj    The object to generate snapshot.
- * @param cf     color format for generated image.
- *
- * @return the buffer size needed in bytes
+/**
+ * Create a draw buffer for object to store the snapshot image.
  */
-uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
+lv_draw_buf_t * lv_snapshot_create_draw_buf(lv_obj_t * obj, lv_color_format_t cf)
 {
-    LV_ASSERT_NULL(obj);
-    switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR:
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
-        case LV_IMG_CF_ALPHA_8BIT:
-            break;
-        default:
-            LV_LOG_WARN("Not supported color format");
-            return 0;
-    }
-
     lv_obj_update_layout(obj);
-
-    /*Width and height determine snapshot image size.*/
-    lv_coord_t w = lv_obj_get_width(obj);
-    lv_coord_t h = lv_obj_get_height(obj);
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
-    uint8_t px_size;
-    if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
-    else px_size = sizeof(lv_color_t);
+    if(w == 0 || h == 0) return NULL;
 
-    return w * h * px_size;
+    return lv_draw_buf_create(w, h, cf, LV_STRIDE_AUTO);
 }
 
-/** Take snapshot for object with its children, save image info to provided buffer.
- *
- * @param obj    The object to generate snapshot.
- * @param cf     color format for generated image.
- * @param dsc    image descriptor to store the image result.
- * @param buf    the buffer to store image data.
- * @param buff_size provided buffer size in bytes.
- *
- * @return LV_RES_OK on success, LV_RES_INV on error.
- */
-lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size)
+lv_result_t lv_snapshot_reshape_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
+{
+    lv_obj_update_layout(obj);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    w += ext_size * 2;
+    h += ext_size * 2;
+    if(w == 0 || h == 0) return LV_RESULT_INVALID;
+
+    draw_buf = lv_draw_buf_reshape(draw_buf, LV_COLOR_FORMAT_UNKNOWN, w, h, LV_STRIDE_AUTO);
+    return draw_buf == NULL ? LV_RESULT_INVALID : LV_RESULT_OK;
+}
+
+lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(dsc);
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT_NULL(draw_buf);
+    lv_result_t res;
 
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR:
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
-        case LV_IMG_CF_ALPHA_8BIT:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
             break;
         default:
             LV_LOG_WARN("Not supported color format");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
     }
 
-    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size) return LV_RES_INV;
+    res = lv_snapshot_reshape_draw_buf(obj, draw_buf);
+    if(res != LV_RESULT_OK) return res;
 
-    /*Width and height determine snapshot image size.*/
-    lv_coord_t w = lv_obj_get_width(obj);
-    lv_coord_t h = lv_obj_get_height(obj);
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    w += ext_size * 2;
-    h += ext_size * 2;
+    /* clear draw buffer*/
+    lv_draw_buf_clear(draw_buf, NULL);
 
     lv_area_t snapshot_area;
+    int32_t w = draw_buf->header.w;
+    int32_t h = draw_buf->header.h;
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     lv_obj_get_coords(obj, &snapshot_area);
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
-    lv_memset(buf, 0x00, buff_size);
-    lv_memzero(dsc, sizeof(lv_img_dsc_t));
-    dsc->data = buf;
-    dsc->header.w = w;
-    dsc->header.h = h;
-    dsc->header.cf = cf;
+    lv_layer_t layer;
+    lv_memzero(&layer, sizeof(layer));
 
+    layer.draw_buf = draw_buf;
+    layer.buf_area.x1 = snapshot_area.x1;
+    layer.buf_area.y1 = snapshot_area.y1;
+    layer.buf_area.x2 = snapshot_area.x1 + w - 1;
+    layer.buf_area.y2 = snapshot_area.y1 + h - 1;
+    layer.color_format = cf;
+    layer._clip_area = snapshot_area;
 
-    lv_disp_t * obj_disp = lv_obj_get_disp(obj);
-    lv_disp_drv_t driver;
-    lv_disp_drv_init(&driver);
-    /*In lack of a better idea use the resolution of the object's display*/
-    driver.hor_res = lv_disp_get_hor_res(obj_disp);
-    driver.ver_res = lv_disp_get_hor_res(obj_disp);
+    lv_display_t * disp_old = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp_new = lv_obj_get_display(obj);
+    lv_layer_t * layer_old = disp_new->layer_head;
+    disp_new->layer_head = &layer;
 
+    _lv_refr_set_disp_refreshing(disp_new);
+    lv_obj_redraw(&layer, obj);
 
-    lv_disp_t fake_disp;
-    lv_memzero(&fake_disp, sizeof(lv_disp_t));
-    fake_disp.driver = &driver;
+    while(layer.draw_task_head) {
+        lv_draw_dispatch_wait_for_request();
+        lv_draw_dispatch_layer(NULL, &layer);
+    }
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(obj_disp->driver->draw_ctx_size);
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL) return LV_RES_INV;
-    obj_disp->driver->draw_ctx_init(fake_disp.driver, draw_ctx);
-    fake_disp.driver->draw_ctx = draw_ctx;
-    draw_ctx->clip_area = &snapshot_area;
-    draw_ctx->buf_area = &snapshot_area;
-    draw_ctx->buf = (void *)buf;
-    if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) draw_ctx->color_format = LV_COLOR_FORMAT_L8;
-    else if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) draw_ctx->render_with_alpha = false;
-    else draw_ctx->render_with_alpha = true;
+    disp_new->layer_head = layer_old;
+    _lv_refr_set_disp_refreshing(disp_old);
 
-    driver.draw_ctx = draw_ctx;
-
-    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
-    _lv_refr_set_disp_refreshing(&fake_disp);
-
-    lv_obj_redraw(draw_ctx, obj);
-
-    if(draw_ctx->buffer_convert) draw_ctx->buffer_convert(draw_ctx);
-
-    _lv_refr_set_disp_refreshing(refr_ori);
-    obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);
-    lv_free(draw_ctx);
-
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
-/** Take snapshot for object with its children, alloc the memory needed.
- *
- * @param obj    The object to generate snapshot.
- * @param cf     color format for generated image.
- *
- * @return a pointer to an image descriptor, or NULL if failed.
- */
-lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
+lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
-    uint32_t buff_size = lv_snapshot_buf_size_needed(obj, cf);
+    lv_draw_buf_t * draw_buf = lv_snapshot_create_draw_buf(obj, cf);
+    if(draw_buf == NULL) return NULL;
 
-    void * buf = lv_malloc(buff_size);
-    LV_ASSERT_MALLOC(buf);
-    if(buf == NULL) {
+    if(lv_snapshot_take_to_draw_buf(obj, cf, draw_buf) != LV_RESULT_OK) {
+        lv_draw_buf_destroy(draw_buf);
         return NULL;
     }
 
-    lv_img_dsc_t * dsc = lv_malloc(sizeof(lv_img_dsc_t));
-    LV_ASSERT_MALLOC(buf);
-    if(dsc == NULL) {
-        lv_free(buf);
-        return NULL;
-    }
-
-    if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buff_size) == LV_RES_INV) {
-        lv_free(buf);
-        lv_free(dsc);
-        return NULL;
-    }
-
-    return dsc;
-}
-
-/** Free the snapshot image returned by @ref lv_snapshot_take
- *
- * It will firstly free the data image takes, then the image descriptor.
- *
- * @param dsc    The image descriptor generated by lv_snapshot_take.
- *
- */
-void lv_snapshot_free(lv_img_dsc_t * dsc)
-{
-    if(!dsc)
-        return;
-
-    if(dsc->data)
-        lv_free((void *)dsc->data);
-
-    lv_free(dsc);
+    return draw_buf;
 }
 
 /**********************
