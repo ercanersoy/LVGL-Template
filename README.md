@@ -28,5 +28,4 @@ You should execute these command lines to running.
 
 ## Tested Operating Systems
 
-* Pardus 21
 * Pardus 23
